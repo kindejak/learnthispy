@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{chapter.title}}</h1>
+    <p>{{course.description}}</p>
+    {% for textblock in text_blocks %}
+        {{ textblock.content | safe}}
+    {% endfor %}
+{% endblock %}
