@@ -8,6 +8,13 @@
             <li>
                 <a href="./{{chapter.slug}}">{{ chapter.title }}</a>
             </li>
+            <ul>
+                {% for coding_problem in chapter.coding_problems %}
+                <li>
+                    <a href="./{{chapter.slug}}/{{coding_problem.slug}}">{{ coding_problem }}</a>
+                </li>
+            {% endfor %}
+            </ul>
         {% endfor %}
     </ul>
 {% endblock %}

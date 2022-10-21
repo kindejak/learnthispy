@@ -29,5 +29,32 @@ class Chapter(models.Model):
 
 # text_blocks
 class TextBlock(models.Model):
+    title = models.CharField(max_length=100)
     content = models.TextField()
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE)
+    slug = models.SlugField(max_length=40,null=True)
+
+class CodingProblem(models.Model):
+    title = models.CharField(max_length=100)
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE,null = True)
+    description = models.TextField()
+    time_limit = models.IntegerField(default=10)
+    memory_limit = models.IntegerField(default=256)
+    output = models.TextField(blank=True, null=False)
+    deadline = models.DateTimeField(blank=True, null=True)
+    code_template = models.TextField(blank=True, null=False)    
+    slug = models.SlugField(max_length=40,null=True,unique=True)
+
+    def __str__(self):
+        return self.title
+    
+    
+class UserSolution(models.Model):
+    coding_problem = models.ForeignKey(CodingProblem, on_delete=models.CASCADE)
+    input = models.TextField(blank=True, null=False)
+    output = models.TextField(blank=True, null=False)
+    coding_problem = models.ForeignKey(CodingProblem, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    submission_time = models.DateTimeField(auto_now_add=True)
+    code = models.TextField(blank=True, null=False)
+    error = models.TextField(blank=True, null=False)
