@@ -56,5 +56,7 @@ class UserSolution(models.Model):
     coding_problem = models.ForeignKey(CodingProblem, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     submission_time = models.DateTimeField(auto_now_add=True)
-    code = models.TextField(blank=True, null=False)
     error = models.TextField(blank=True, null=False)
+
+    def __str__(self):
+        return self.user.username + " " + self.coding_problem.title + " " + str(self.submission_time)
