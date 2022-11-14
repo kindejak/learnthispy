@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{chapter.title}}</h1>
+<p>{{course.description}}</p>
+{% for p in parts %}
+<nav>
+    <ul>
+        <li><a href="../{{p.slug}}">{{p.title}} - 
+            {% if p.type == 'text' %}
+            📖
+            {% elif p.type == 'coding_problem' %}
+            🖥️
+            {% elif p.type == 'quiz' %}
+            ❓
+        {% endif %}</a></li>
+    </ul>
+</nav>
+{% endfor %}
+<main>
+    {{part.content|safe}}
+</main>
+{% endblock %}

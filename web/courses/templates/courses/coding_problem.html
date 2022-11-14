@@ -13,6 +13,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js" integrity="sha512-2M0GdbU5OxkGYMhakED69bw0c1pW3Nb0PeF3+9d+SnwN1ryPx3wiDdNqK3gSM7KAU/pEV+2tFJFbMKjKAahOkQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" integrity="sha512-uf06llspW44/LZpHzHT6qBOIVODjWtv4MxCricRxkzvopAlSWnTf6hpZTFxuuZcuNE9CBQhqE0Seu1CoRk84nQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/idea.min.css" integrity="sha512-N+NJU9LvDmlEQyb3xDkcXPOR8SDXQGx4kRs9wCi/U6GPfN/FSsfjIzY61Svd8eg4Y1VcbBL1XhuC3VzzQYmcJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.css" integrity="sha512-OmcLQEy8iGiD7PSm85s06dnR7G7C9C0VqahIPAj/KHk5RpOCmnC6R2ob1oK4/uwYhWa9BF1GC6tzxsC8TIx7Jg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.js" integrity="sha512-yhmeAerubMLaGAsyS7sE8Oqub6GeTkBDQpkXo2JKHgg7JOCudQvcbDQc5rPxdl7MqcDusTJzSy+ODlyzAwETfQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{% static 'js/python-hint.js' %}" type="text/javascript"></script>
 </head>
 <body>
 <header>
@@ -26,12 +29,30 @@
 </nav>
 
 {% block content %}
+
+{% for p in parts %}
+<nav>
+    <ul>
+        <li><a href="../{{p.slug}}">{{p.title}} - 
+            {% if p.type == 'text' %}
+            📖
+            {% elif p.type == 'coding_problem' %}
+            🖥️
+            {% elif p.type == 'quiz' %}
+            ❓
+        {% endif %}</a></li>
+    </ul>
+</nav>
+{% endfor %}
+
 <h1>{{coding_problem.title}}</h1>
 <p>{{coding_problem.description | safe }}</p>
 <p>Code:</p>
-<form action="./submit" method="post">
+<form action="./submit/" method="post">
+    
+
     {% csrf_token %}
-    <textarea name='code' id='code'>{% for sol in user_solutions %}{% if forloop.last %}{{ sol.input }}{% endif %}{% endfor %}</textarea>
+    <textarea name='code' id='code'>{{ user_last_solution.input }}</textarea>
     <br>
     <div class="buttons">
         <button type="submit" id='run'>Run</button>
@@ -40,9 +61,11 @@
 </form>
 <p>Output:</p>
 <textarea id='output'>
-{% if user_output %}{{user_output}}{% endif %}
+{{ user_last_solution.output }}
 </textarea>
 <br>
+
+
 {% if user_solutions %}
     <p>Previous submissions:</p>
     <ul>

@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 
-from courses.models import Course, Chapter, TextBlock, CodingProblem, UserSolution
+from courses.models import Course, Chapter, TextPart, CodingProblemPart, UserSolution, QuizPart, Part
 from django.contrib.auth.models import User
 
 import io
@@ -25,44 +25,69 @@ def courses(request):
 @login_required
 def course(request, course_slug):
     course = Course.objects.get(slug=course_slug)
-    chapters = Chapter.objects.filter(course=course)
-    #for each chapter get a coding problem
-    for chapter in chapters:
-        coding_problems = []
-        chapter.coding_problems = CodingProblem.objects.filter(chapter=chapter)
-
+    chapters = course.chapters.all()
+    print(chapters)
     context = {
         "course": course,
         "chapters": chapters,
     }
+    print(context)
 
     return render(request, "courses/course_detail.html", context)
 
 @login_required
 def chapter(request, course_slug, chapter_slug):
     chapter = Chapter.objects.get(slug=chapter_slug)
-    text_blocks = TextBlock.objects.filter(chapter=chapter)
+    parts = chapter.parts.all().order_by("position")
     context = {
         "chapter": chapter,
-        "text_blocks": text_blocks,
+        "parts": parts,
     }
 
     return render(request, "courses/chapter.html", context)
 
+
 @login_required
-def coding_problem(request, course_slug, chapter_slug, coding_problem_slug,user_output=None):
-    coding_problem = CodingProblem.objects.get(slug=coding_problem_slug)
-    user_solutions = UserSolution.objects.filter(coding_problem=coding_problem).filter(user=request.user).order_by("submission_time")
-    context = {
-        "coding_problem": coding_problem,
-        "user_solutions": list(user_solutions),
-        "user_output": user_output,
-    }
-    return render(request, "courses/coding_problem.html", context)
+def part(request, course_slug, chapter_slug, part_slug):
+    part = Part.objects.get(slug=part_slug)
+    chapter = Chapter.objects.get(slug=chapter_slug)
+    parts = chapter.parts.all().order_by("position")
+
+    if part.type == "text":
+        part = TextPart.objects.get(slug=part_slug)
+        context = {
+        "part": part,
+        "parts": parts,
+        }
+        return render(request, "courses/text.html", context)
+
+    elif part.type == "coding_problem":
+        coding_problem = CodingProblemPart.objects.get(slug=part_slug)
+        user_solutions = UserSolution.objects.filter(coding_problem=coding_problem).filter(user=request.user).order_by("submission_time")
+        user_last_solution = user_solutions.last()
+        context = {
+            "parts": parts,
+            "coding_problem": coding_problem,
+            "user_solutions": list(user_solutions),
+            "user_last_solution": user_last_solution,
+        }
+        print(context)
+        return render(request, "courses/coding_problem.html", context)
+        
+
+    elif part.type == "quiz":
+        part = QuizPart.objects.get(slug=part_slug)
+        parts = chapter.parts.all().order_by("position")
+        context = {
+            "part": part,
+            "parts": parts,
+        }
+        return render(request, "courses/quiz.html", context)
+
 
 @login_required
 def submit_solution(request, course_slug, chapter_slug, coding_problem_slug):
-    coding_problem_object = CodingProblem.objects.get(slug=coding_problem_slug)
+    coding_problem_object = CodingProblemPart.objects.get(slug=coding_problem_slug)
     user_solution = UserSolution()
     user_solution.coding_problem = coding_problem_object
     user_solution.user = request.user
@@ -72,5 +97,6 @@ def submit_solution(request, course_slug, chapter_slug, coding_problem_slug):
         exec(user_solution.input)
     user_solution.output = f.getvalue()
     user_solution.save()
+    print(user_solution.output)
     # redirect to coding_problem
-    return redirect("coding_problem",course_slug, chapter_slug, coding_problem_slug)
+    return redirect("part",course_slug, chapter_slug, coding_problem_slug)
