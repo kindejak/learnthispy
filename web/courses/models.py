@@ -38,7 +38,8 @@ class CodingProblemPart(Part):
     description = models.TextField()
     time_limit = models.IntegerField(default=10)
     memory_limit = models.IntegerField(default=256)
-    output = models.TextField(blank=True, null=False)
+    input = models.TextField(blank=True, null=False)
+    expected_output = models.TextField(blank=True, null=False)
     deadline = models.DateTimeField(blank=True, null=True)
     code_template = models.TextField(blank=True, null=False)    
  

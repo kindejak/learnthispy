@@ -15,6 +15,8 @@ import os
 import json
 
 
+from courses.utils import compare_texts
+
 # Create your views here.
 
 @login_required
@@ -73,11 +75,18 @@ def part(request, course_slug, chapter_slug, part_slug):
         coding_problem = CodingProblemPart.objects.get(slug=part_slug)
         user_solutions = UserSolution.objects.filter(coding_problem=coding_problem).filter(user=request.user).order_by("submission_time")
         user_last_solution = user_solutions.last()
+
+        # compare user solution with expected output
+        if user_last_solution:
+            diff = compare_texts(user_last_solution.output, coding_problem.expected_output)
+
+
         context = {
             "parts": parts,
             "coding_problem": coding_problem,
             "user_solutions": list(user_solutions),
             "user_last_solution": user_last_solution,
+            "diff": diff,
         }
         print(context)
         return render(request, "courses/coding_problem.html", context)
