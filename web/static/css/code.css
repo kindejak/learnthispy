@@ -17,7 +17,6 @@
     height: 1em;
 }
 
-body { margin: 3em; }
 
 .tooltip { position: relative; }
 
@@ -34,10 +33,29 @@ body { margin: 3em; }
 
 .tooltip:hover::before { opacity:1; top: 150%; }
 
-
+.diff {
+    display: inline-table;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: small;
+    width: auto;
+    table-layout: auto;
+}
 /*  */
 #lint_output {
     border: 1px solid #cdcdcd;
     border-radius: 0.25rem;
     width: 100%;
+}
+
+.diff_chg {
+    background-color: #ff5555;
+}
+
+.diff_add {
+    background-color: #ff5555;
+}
+
+.diff_sub {
+    background-color: #ff5555;
 }

@@ -59,7 +59,7 @@
     
 
     {% csrf_token %}
-    <textarea name='code' id='code'>{{ user_last_solution.input }}</textarea>
+    <textarea name='code' id='code'>{% if user_last_solution %}{{ user_last_solution.input }}{% else %}{{ coding_problem.code_template }}{% endif %}</textarea>
     <br>
     <div class="buttons">
         <button type="submit" id='run'>Run</button>

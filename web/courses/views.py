@@ -76,10 +76,14 @@ def part(request, course_slug, chapter_slug, part_slug):
         user_solutions = UserSolution.objects.filter(coding_problem=coding_problem).filter(user=request.user).order_by("submission_time")
         user_last_solution = user_solutions.last()
 
+
         # compare user solution with expected output
         if user_last_solution:
             diff = compare_texts(user_last_solution.output, coding_problem.expected_output)
+        else:
+            diff = ""
 
+        print(user_last_solution)
 
         context = {
             "parts": parts,
@@ -130,8 +134,10 @@ def lint_code(request):
     options = ' '.join([
         file.name,
         '--output-format', 'json',
-        '--disable', 'C0114', 
+        '--disable', 'C0114',
+        '--disable', 'C0116', 
         '--disable', 'C0305',
+        '--disable', 'C0103',
     ])
 
     (lint_stdout, lint_stderr) = epylint.py_run(return_std=True, command_options=options)
