@@ -5,3 +5,39 @@
 .CodeMirror {
     border-radius: 10px;
 }
+
+.buttons_row_centred {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.em {
+    height: 1em;
+}
+
+body { margin: 3em; }
+
+.tooltip { position: relative; }
+
+.tooltip::before {
+  content: "\2003" attr(class); /* print em-space with class text */
+  text-indent: -3.9em; /* add negative text offset to hide class name */
+  display: inline-block;
+  position: absolute; top: 150%;
+  background: #000; color: #FFF; padding: 5px; border-radius: 5px;
+  opacity:0; transition:0.3s; overflow:hidden;
+  max-width: 50%; /* avoids very long sentences */
+  pointer-events: none; /* prevents tooltip from firing on pseudo hover */
+}
+
+.tooltip:hover::before { opacity:1; top: 150%; }
+
+
+/*  */
+#lint_output {
+    border: 1px solid #cdcdcd;
+    border-radius: 0.25rem;
+    width: 100%;
+}

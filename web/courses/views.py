@@ -1,11 +1,19 @@
 from django.shortcuts import redirect, render
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 from courses.models import Course, Chapter, TextPart, CodingProblemPart, UserSolution, QuizPart, Part
 from django.contrib.auth.models import User
 
 import io
 from contextlib import redirect_stdout
+
+from pylint import epylint
+import tempfile
+import os
+import json
+
 
 # Create your views here.
 
@@ -100,3 +108,25 @@ def submit_solution(request, course_slug, chapter_slug, coding_problem_slug):
     print(user_solution.output)
     # redirect to coding_problem
     return redirect("part",course_slug, chapter_slug, coding_problem_slug)
+
+@csrf_exempt
+def lint_code(request):
+    # convert json to python dict
+    data = json.loads(request.body)
+
+    file = tempfile.NamedTemporaryFile(delete=False, mode='w')
+    file.write(data['code'])
+    file.close()
+
+    options = ' '.join([
+        file.name,
+        '--output-format', 'json',
+        '--disable', 'C0114', 
+        '--disable', 'C0305',
+    ])
+
+    (lint_stdout, lint_stderr) = epylint.py_run(return_std=True, command_options=options)
+
+    os.remove(file.name)
+    print(lint_stdout.getvalue())
+    return HttpResponse(json.dumps(lint_stdout.getvalue()), content_type="application/json")
