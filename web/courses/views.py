@@ -115,8 +115,12 @@ def submit_solution(request, course_slug, chapter_slug, coding_problem_slug):
     user_solution.input = str(request.POST["code"])
     # run code
     with redirect_stdout(io.StringIO()) as f:
-        exec(user_solution.input)
-    user_solution.output = f.getvalue()
+        try:
+            exec(user_solution.input)
+            user_solution.output = f.getvalue()
+        except Exception as e:
+            user_solution.error = e
+            user_solution.output = e.__str__()
     user_solution.save()
     print(user_solution.output)
     # redirect to coding_problem
